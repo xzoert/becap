@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Becap
+Comment=Backup your files.
+Exec=/home/xzoert/Documents/becap/becap.sh
+Icon=/home/xzoert/Documents/becap/icon.svg
+Terminal=false
+Type=Application
+Categories=Utility;Application;
+
