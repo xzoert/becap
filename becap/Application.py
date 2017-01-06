@@ -1,7 +1,7 @@
 from PySide.QtCore import *
 from PySide.QtGui import *
 
-import os, os.path, json, sys, subprocess, datetime
+import os, os.path, json, sys, subprocess, datetime, time
 
 from .MainWindow import MainWindow
 from .BackupThread import BackupThread
@@ -44,6 +44,9 @@ class Application(QApplication):
 		
 		self.exec_()
 
+	def abortBackup(self):
+		if self.backupThread and self.backupThread.isRunning:
+			self.backupThread.abort()
 
 	def savePrefs(self):
 		with open(self.prefFile,'w') as outfile:

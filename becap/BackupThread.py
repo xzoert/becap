@@ -1,7 +1,7 @@
 from PySide.QtCore import *
 from PySide.QtGui import *
 
-import os, os.path, json, sys, subprocess, datetime, re
+import os, os.path, json, sys, subprocess, datetime, re, shutil
 
 
 class BackupThread(QThread):
@@ -12,10 +12,15 @@ class BackupThread(QThread):
 	def __init__(self,app):
 		self.app=app
 		QThread.__init__(self)
-		self.fileNumberRe=re.compile('Number of files\: \d+ \(reg\: (\d+), dir\: \d+\)')
+		self.aborted=False
 	
+	def abort(self):
+		self.aborted=True
 	
 	def run(self):
+		backupPath=None
+		process=None
+		fileCount=0
 		try:
 			s=self.app.getSource()
 			if not os.path.isdir(s):
@@ -31,7 +36,7 @@ class BackupThread(QThread):
 			now=datetime.datetime.now()
 			backupName=now.strftime('%Y-%m-%d_%H-%M')
 			backupPath=t+'/'+backupName
-			if os.path.exists(backupPath):
+			if os.path.exists(backupPath):                    
 				raise Exception('Backup %s already exists'%backupName)
 			allPath=t+'/all'
 			lastPath=t+'/last'
@@ -47,8 +52,6 @@ class BackupThread(QThread):
 			else:
 				os.mkdir(backupPath)
 
-			if not os.path.isdir(allPath):
-				os.mkdir(allPath)
 
 
 			# CREATE THE EXCLUDE FILE
@@ -64,15 +67,20 @@ class BackupThread(QThread):
 			fileNumber=0
 					
 			# SIMULATION TO GET FILE COUNT
-			self.progress.emit('Counting files...',0)
 			process = subprocess.Popen(['rsync','-avvn','--exclude-from',excludeFilePath,s+'/',backupPath], stdout=subprocess.PIPE, universal_newlines=True,bufsize=1,cwd=s)
 			for line in iter(process.stdout.readline, ''):
-				fileNumber+=1
+				if self.aborted:
+					raise Exception('Aborted!')
+				if line!='':
+					fileNumber+=1
+					self.progress.emit('Counting files...'+str(fileNumber),0)
 			#print('File number',fileNumber)
 			fileCount=0
 			# RSYNC 
 			process = subprocess.Popen(['rsync','-avv','--delete','--exclude-from',excludeFilePath,s+'/',backupPath], stdout=subprocess.PIPE, universal_newlines=True,bufsize=1,cwd=s)
 			for line in iter(process.stdout.readline, ''):
+				if self.aborted:
+					raise Exception('Aborted!')
 				if line!='':
 					fileCount+=1
 					if fileCount>=fileNumber:
@@ -84,9 +92,13 @@ class BackupThread(QThread):
 			
 			fileCount=0
 			# CREATE LINKS IN ALL
+			if not os.path.isdir(allPath):
+				os.mkdir(allPath)
 			self.progress.emit('Creating links in all...',100)
 			process = subprocess.Popen(['cp','-avvl',backupPath+'/.',allPath], stdout=subprocess.PIPE, universal_newlines=True,bufsize=1)
 			for line in iter(process.stdout.readline, ''):
+				if self.aborted:
+					raise Exception('Aborted!')
 				if line!='':
 					#print(line)
 					#self.progress.emit(line,0)
@@ -105,6 +117,29 @@ class BackupThread(QThread):
 			self.done.emit(None)
 		
 		except Exception as err:
+			self.progress.emit('Aborting...',0)
+			if process:
+				try:
+					print('Termninating process',process)
+					process.terminate()
+				except:
+					pass
+			if backupPath:
+				try:
+					removeCount=0
+					process = subprocess.Popen(['rm','-rvf',backupPath], stdout=subprocess.PIPE, universal_newlines=True,bufsize=1)
+					for line in iter(process.stdout.readline, ''):
+						if line!='':
+							removeCount+=1
+							if removeCount>=fileCount:
+								perc=100
+							else:
+								perc=int(removeCount*100/fileCount)
+							self.progress.emit('Aborting...',perc)
+					#print('Removing',backupPath)
+					#shutil.rmtree(backupPath)
+				except:
+					pass
 			self.done.emit(str(err))
 			raise err
 			

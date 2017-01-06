@@ -37,26 +37,36 @@ class MainWindow(QMainWindow):
 		
 		self.app.backupProgress.connect(self.setBackupProgress)
 		self.app.backupDone.connect(self.backupDone)
+		self.doingBackup=False
 		
 		self.ui.restoreButton.clicked.connect(self.doRestore)
 		
 	def doRestore(self):
-		restoreDir = QFileDialog.getExistingDirectory(self,self.tr('Choose where to export'),self.app.getTarget())
+		restoreDir = QFileDialog.getExistingDirectory(self,self.tr('Choose directory to restore.'),self.app.getTarget())
 		if restoreDir:
+			self.ui.backupButton.setDisabled(True)
+			self.ui.restoreButton.setDisabled(True)
 			self.app.doRestore(restoreDir)
 
 
 	def doBackup(self):
-		self.ui.backupButton.setDisabled(True)
-		self.ui.restoreButton.setDisabled(True)
-		self.ui.statusLabel.setText('')
-		self.app.doBackup()
+		if self.doingBackup:
+			self.setBackupProgress('Aborting...',0)
+			self.app.abortBackup()
+		else:
+			self.ui.backupButton.setText(self.tr('Cancel'))
+			self.ui.restoreButton.setDisabled(True)
+			self.ui.statusLabel.setText('')
+			self.doingBackup=True
+			self.app.doBackup()
 		
 	def backupDone(self,err):
 		if err:
-			QMessageBox.warning(self,'Error during backup',err)
+			QMessageBox.warning(self,'An error was encountered:',err)
 			
 		self.ui.backupButton.setDisabled(False)
+		self.ui.backupButton.setText(self.tr('Backup'))
+		self.doingBackup=False
 		self.ui.restoreButton.setDisabled(False)
 		self.ui.statusLabel.setText('done.')
 		self.ui.statusProgressBar.hide()

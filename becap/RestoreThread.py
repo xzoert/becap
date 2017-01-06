@@ -35,11 +35,11 @@ class RestoreThread(QThread):
 			fileNumber=0
 					
 			# SIMULATION TO GET FILE COUNT
-			self.progress.emit('Counting files...',0)
 			process = subprocess.Popen(['rsync','-avvn',s+'/',t], stdout=subprocess.PIPE, universal_newlines=True,bufsize=1,cwd=s)
 			for line in iter(process.stdout.readline, ''):
-				self.progress.emit('Counting files...'+str(fileNumber),0)
-				fileNumber+=1
+				if line!='':
+					fileNumber+=1
+					self.progress.emit('Counting files...'+str(fileNumber),0)
 			fileCount=0
 			
 			# RSYNC 
