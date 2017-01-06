@@ -41,7 +41,7 @@ class BackupThread(QThread):
 			allPath=t+'/all'
 			lastPath=t+'/last'
 			
-			if os.path.isdir(lastPath):
+			if os.path.exists(lastPath):
 				self.progress.emit('Copying last...',0)
 				# COPY LAST AS HARD LINKS
 				process = subprocess.Popen(['cp','-avl',lastPath+'/.',backupPath], stdout=subprocess.PIPE, universal_newlines=True,bufsize=1)

@@ -52,6 +52,7 @@ class MainWindow(QMainWindow):
 	def doBackup(self):
 		if self.doingBackup:
 			self.setBackupProgress('Aborting...',0)
+			self.ui.backupButton.setDisabled(True)
 			self.app.abortBackup()
 		else:
 			self.ui.backupButton.setText(self.tr('Cancel'))
