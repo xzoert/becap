@@ -24,12 +24,12 @@ class Application(QApplication):
 		else:
 			dataDir='~/.becap'
 
-		self.dataDir=os.path.abspath(dataDir)
+		self.dataDir=os.path.expanduser(dataDir)
 		
 		if not os.path.exists(self.dataDir):
 			os.makedirs(self.dataDir)
 		
-		self.prefs={}
+		self.prefs={'source':'~','exclude':{'~/.cache':1,'~/.googleearth':1}}
 		self.prefFile=self.dataDir+'/prefs.json'
 		if os.path.exists(self.prefFile):
 			with open(self.prefFile,'r') as infile:
