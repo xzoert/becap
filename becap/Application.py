@@ -29,7 +29,7 @@ class Application(QApplication):
 		if not os.path.exists(self.dataDir):
 			os.makedirs(self.dataDir)
 		
-		self.prefs={'source':'~','exclude':{'~/.cache':1,'~/.googleearth':1}}
+		self.prefs={'source':'~','exclude':{'~/.cache':1,'~/.googleearth':1,'~/.dbus':1,'.gfs':1}}
 		self.prefFile=self.dataDir+'/prefs.json'
 		if os.path.exists(self.prefFile):
 			with open(self.prefFile,'r') as infile:
