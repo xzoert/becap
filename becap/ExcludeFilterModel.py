@@ -1,7 +1,7 @@
 from PySide.QtCore import *
 from PySide.QtGui import *
-from dedalus import *
-from dedalus.ui import icons
+#from dedalus import *
+#from dedalus.ui import icons
 
 
 class ExcludeFilterModel(QAbstractTableModel):

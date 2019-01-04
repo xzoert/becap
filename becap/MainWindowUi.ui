@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>586</width>
-    <height>512</height>
+    <width>600</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -249,13 +249,13 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>35</height>
+           <height>50</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>35</height>
+           <height>50</height>
           </size>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -281,7 +281,7 @@
              <string>status:</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
             </property>
            </widget>
           </item>
@@ -307,7 +307,6 @@
    </layout>
    <zorder>widget</zorder>
    <zorder>widget_2</zorder>
-   <zorder>label_2</zorder>
    <zorder>widget_3</zorder>
    <zorder>widget_5</zorder>
    <zorder>line_2</zorder>
